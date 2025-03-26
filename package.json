@@ -1,0 +1,14 @@
+{
+  "name": "industrial-symbiosis-marketplace",
+  "version": "1.0.0",
+  "description": "A marketplace for industrial waste materials and byproducts",
+  "scripts": {
+    "start": "cd frontend && npm start",
+    "install-all": "cd frontend && npm install",
+    "build": "cd frontend && npm run build",
+    "test": "cd frontend && npm test",
+    "lint": "cd frontend && npm run lint"
+  },
+  "author": "",
+  "license": "ISC"
+} 
