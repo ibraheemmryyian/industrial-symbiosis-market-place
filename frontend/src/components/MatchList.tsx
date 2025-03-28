@@ -15,14 +15,16 @@ interface Match {
   };
   status: 'pending' | 'accepted' | 'rejected';
   created_at: string;
-  waste: {
+  wastes: {
     material_name: string;
     quantity: number;
     unit: string;
-    company_name: string;
+    companies: {
+      name: string;
+    };
   };
-  consumer: {
-    company_name: string;
+  companies: {
+    name: string;
   };
 }
 
@@ -42,14 +44,27 @@ export function MatchList() {
       if (!user) throw new Error('Not authenticated');
 
       // Get matches where current user is either waste provider or consumer
+      // First get user's company_id
+      const { data: profile } = await supabase
+        .from('company_profiles')
+        .select('company_id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (!profile?.company_id) {
+        setError('Please complete your company profile first');
+        setMatches([]);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('matches')
         .select(`
           *,
-          waste: waste_id (material_name, quantity, unit, company: company_id (name as company_name)),
-          consumer: consumer_id (company: company_id (name as company_name))
+          wastes!waste_id (material_name, quantity, unit, companies!company_id (name)),
+          companies!consumer_id (name)
         `)
-        .or(`waste_id.eq.${user.id},consumer_id.eq.${user.id}`)
+        .or(`waste_id.in.(select id from wastes where company_id.eq.${profile.company_id}),consumer_id.eq.${profile.company_id}`)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -98,10 +113,10 @@ export function MatchList() {
               <div className="flex justify-between items-start">
                 <div>
                   <h3 className="font-medium text-lg">
-                    {match.waste.material_name} ({match.waste.quantity} {match.waste.unit})
+                    {match.wastes.material_name} ({match.wastes.quantity} {match.wastes.unit})
                   </h3>
                   <p className="text-gray-600">
-                    {match.waste.company_name} → {match.consumer.company_name}
+                    {match.wastes.companies.name} → {match.companies.name}
                   </p>
                 </div>
                 <div className="flex items-center space-x-2">

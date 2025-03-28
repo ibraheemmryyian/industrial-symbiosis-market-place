@@ -26,14 +26,46 @@ export function MaterialForm({ onClose, type }: MaterialFormProps) {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
+      // First check if user already has a company profile
+      const { data: profile, error: profileError } = await supabase
+        .from('company_profiles')
+        .select('company_id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (profileError && profileError.code !== 'PGRST116') throw profileError;
+      
+      let companyId = profile?.company_id;
+      
+      // If no company exists, create one
+      if (!companyId) {
+        const { data: newCompanyId, error: rpcError } = await supabase.rpc('create_company_and_profile', {
+          user_id: user.id,
+          profile_data: {
+            industry: 'Other',
+            location: '',
+            description: ''
+          },
+          company_data: {
+            name: 'My Company'
+          }
+        });
+
+        if (rpcError) throw rpcError;
+        companyId = newCompanyId;
+      }
+
+      if (!companyId) throw new Error('Failed to create/get company');
+
       const { error: err } = await supabase.from('materials').insert([
         {
-          ...formData,
-          type,
+          name: formData.material_name,
           quantity: parseFloat(formData.quantity),
-          company_id: user.id
+          unit: formData.unit,
+          description: formData.description,
+          company_id: companyId
         },
-      ]);
+      ]).select();
 
       if (err) throw err;
       onClose();

@@ -6,6 +6,7 @@
     - `waste_matches` - Stores matches between wastes and consumers
 */
 
+-- Create enums first
 CREATE TYPE waste_type AS ENUM (
   'chemical',
   'metal',
@@ -27,6 +28,32 @@ CREATE TYPE match_status AS ENUM (
   'completed'
 );
 
+-- Companies table with RLS
+CREATE TABLE companies (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE companies ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can manage their companies" ON companies
+  FOR ALL USING (
+    id IN (SELECT company_id FROM company_profiles WHERE user_id = auth.uid())
+  );
+
+-- Materials table with proper company relationship
+CREATE TABLE materials (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  quantity NUMERIC NOT NULL,
+  unit TEXT NOT NULL,
+  description TEXT,
+  company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Wastes table with geospatial data
 CREATE TABLE wastes (
   id SERIAL PRIMARY KEY,
   title TEXT NOT NULL,
@@ -36,72 +63,35 @@ CREATE TABLE wastes (
   quantity FLOAT NOT NULL,
   unit TEXT NOT NULL,
   location TEXT NOT NULL,
-  available_from TIMESTAMPTZ,
-  available_to TIMESTAMPTZ,
-  requires_special_handling BOOLEAN DEFAULT FALSE,
-  special_handling_notes TEXT,
-  is_available BOOLEAN DEFAULT TRUE,
   latitude FLOAT,
   longitude FLOAT,
+  producer_id UUID NOT NULL REFERENCES auth.users(id),
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
-  producer_id UUID REFERENCES auth.users(id) NOT NULL,
-  embedding TEXT,
-  keywords TEXT,
-  category TEXT
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Matches table with explicit relationships
 CREATE TABLE waste_matches (
   id SERIAL PRIMARY KEY,
-  waste_id INTEGER REFERENCES wastes(id) NOT NULL,
-  consumer_id UUID REFERENCES auth.users(id) NOT NULL,
-  match_score FLOAT NOT NULL,
+  waste_id INTEGER NOT NULL REFERENCES wastes(id),
+  consumer_id UUID NOT NULL REFERENCES auth.users(id),
   status match_status DEFAULT 'pending' NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
-  matched_quantity FLOAT,
-  matched_unit TEXT,
-  notes TEXT,
-  producer_notes TEXT,
-  consumer_notes TEXT,
-  producer_rating INTEGER,
-  consumer_rating INTEGER,
-  producer_feedback TEXT,
-  consumer_feedback TEXT,
-  match_reason TEXT,
-  sustainability_score FLOAT
+  match_score FLOAT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Enable RLS for both tables
+-- Enable RLS and create policies
 ALTER TABLE wastes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE waste_matches ENABLE ROW LEVEL SECURITY;
 
--- Policies for wastes table
-CREATE POLICY "Users can manage their own wastes"
-  ON wastes
-  FOR ALL
-  TO authenticated
-  USING (producer_id = auth.uid());
+CREATE POLICY "Waste owners full access" ON wastes
+  FOR ALL USING (producer_id = auth.uid());
 
-CREATE POLICY "Users can read available wastes"
-  ON wastes
-  FOR SELECT
-  TO authenticated
-  USING (is_available = TRUE);
+CREATE POLICY "Public available wastes" ON wastes
+  FOR SELECT USING (true);
 
--- Policies for waste_matches table
-CREATE POLICY "Users can manage their own matches"
-  ON waste_matches
-  FOR ALL
-  TO authenticated
-  USING (consumer_id = auth.uid() OR EXISTS (
-    SELECT 1 FROM wastes WHERE wastes.id = waste_matches.waste_id AND wastes.producer_id = auth.uid()
-  ));
-
-CREATE POLICY "Users can read their own matches"
-  ON waste_matches
-  FOR SELECT
-  TO authenticated
-  USING (consumer_id = auth.uid() OR EXISTS (
-    SELECT 1 FROM wastes WHERE wastes.id = waste_matches.waste_id AND wastes.producer_id = auth.uid()
-  ));
+CREATE POLICY "Match participants access" ON waste_matches
+  FOR ALL USING (
+    consumer_id = auth.uid()
+    OR EXISTS (SELECT 1 FROM wastes WHERE id = waste_id AND producer_id = auth.uid())
+  );
