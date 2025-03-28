@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Users, Settings, Database, Activity } from 'lucide-react';
+import { Users, Settings, Database, Activity, Link } from 'lucide-react';
+import { MatchList } from './MatchList';
 
 interface Company {
   id: string;
@@ -24,7 +25,7 @@ export function AdminHub() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [materials, setMaterials] = useState<Material[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'companies' | 'materials'>('companies');
+  const [activeTab, setActiveTab] = useState<'companies' | 'materials' | 'matches'>('companies');
 
   useEffect(() => {
     loadData();
@@ -101,6 +102,17 @@ export function AdminHub() {
             >
               <Database className="h-5 w-5" />
               <span>Materials</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('matches')}
+              className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition ${
+                activeTab === 'matches'
+                  ? 'bg-emerald-500 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              <Link className="h-5 w-5" />
+              <span>Matches</span>
             </button>
           </div>
 
@@ -225,6 +237,10 @@ export function AdminHub() {
                     </tbody>
                   </table>
                 </div>
+              )}
+
+              {activeTab === 'matches' && (
+                <MatchList />
               )}
             </>
           )}

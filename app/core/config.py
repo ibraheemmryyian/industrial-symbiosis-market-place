@@ -10,8 +10,8 @@ class Settings(BaseSettings):
     VERSION: str = "1.0.0"
     API_V1_STR: str = "/api/v1"
     
-    # Database
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://user:password@localhost:5432/industrial_symbiosis")
+    # Database (Supabase)
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://postgres:@07Ibraheem120@db.jifkiwbxnttrkdrdcose.supabase.co:5432/postgres")
     
     # Security
     SECRET_KEY: str = os.getenv("SECRET_KEY", "your-secret-key-here")
@@ -28,4 +28,4 @@ class Settings(BaseSettings):
     class Config:
         case_sensitive = True
 
-settings = Settings() 
+settings = Settings()

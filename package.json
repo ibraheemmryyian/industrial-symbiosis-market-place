@@ -10,5 +10,8 @@
     "lint": "cd frontend && npm run lint"
   },
   "author": "",
-  "license": "ISC"
-} 
+  "license": "ISC",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.3"
+  }
+}

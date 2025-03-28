@@ -4,6 +4,9 @@ import { supabase } from './lib/supabase';
 import { AuthModal } from './components/AuthModal';
 import { MaterialForm } from './components/MaterialForm';
 import { AdminHub } from './components/AdminHub';
+import { OnboardingForm } from './components/OnboardingForm';
+import { GlobalMap } from './components/GlobalMap';
+import { RoleInfo } from './components/RoleInfo';
 import { isUserAdmin } from './lib/supabase';
 
 function App() {
@@ -11,6 +14,7 @@ function App() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showMaterialForm, setShowMaterialForm] = useState<'waste' | 'requirement' | null>(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const [showAdminHub, setShowAdminHub] = useState(false);
 
   useEffect(() => {
@@ -45,6 +49,8 @@ function App() {
       setShowAuthModal(true);
     } else if (isAdmin) {
       setShowAdminHub(true);
+    } else {
+      setShowOnboarding(true);
     }
   };
 
@@ -71,7 +77,7 @@ function App() {
           <div className="container mx-auto flex justify-between items-center">
             <div className="flex items-center space-x-2">
               <Workflow className="h-8 w-8 text-emerald-400" />
-              <span className="text-2xl font-bold text-white">EcoSync</span>
+              <span className="text-2xl font-bold text-white">LoopLink</span>
             </div>
             <button
               onClick={() => setShowAdminHub(false)}
@@ -102,50 +108,50 @@ function App() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Workflow className="h-8 w-8 text-emerald-400" />
-              <span className="text-2xl font-bold text-white">EcoSync</span>
+              <span className="text-2xl font-bold text-white">LoopLink</span>
             </div>
             <div className="hidden md:flex space-x-8">
               <a href="#how-it-works" className="text-gray-300 hover:text-white transition">How It Works</a>
-              <a href="#benefits" className="text-gray-300 hover:text-white transition">Benefits</a>
-              <a href="#contact" className="text-gray-300 hover:text-white transition">Contact</a>
+              <a href="#map" className="text-gray-300 hover:text-white transition">Global Impact</a>
+              <a href="#roles" className="text-gray-300 hover:text-white transition">How to Help</a>
             </div>
             <button 
               onClick={handleAction}
               className="bg-emerald-500 text-white px-6 py-2 rounded-lg hover:bg-emerald-600 transition"
             >
-              {session ? (isAdmin ? 'Admin Dashboard' : 'Dashboard') : 'Get Started'}
+              {session ? (isAdmin ? 'Admin Dashboard' : 'My Profile') : 'Get Started'}
             </button>
           </div>
         </nav>
 
         <div className="relative z-10 container mx-auto px-6 py-24 text-center">
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
-            Industrial Symbiosis Marketplace
+            Connecting the Circular Economy
           </h1>
           <p className="text-xl text-gray-300 mb-12 max-w-3xl mx-auto">
-            Connect with businesses to exchange resources, reduce waste, and maximize efficiency through AI-powered matching.
+            Join our global network of researchers, industries, and innovators building a sustainable future through resource optimization and waste reduction.
           </p>
           <div className="flex flex-col md:flex-row gap-4 justify-center">
             <button 
-              onClick={handleFindResources}
+              onClick={handleAction}
               className="bg-emerald-500 text-white px-8 py-4 rounded-lg hover:bg-emerald-600 transition flex items-center justify-center space-x-2"
             >
-              <Search className="h-5 w-5" />
-              <span>Find Resources</span>
+              <Users className="h-5 w-5" />
+              <span>Get Started</span>
             </button>
             <button 
               onClick={handleListMaterials}
               className="bg-slate-700 text-white px-8 py-4 rounded-lg hover:bg-slate-600 transition flex items-center justify-center space-x-2"
             >
               <Factory className="h-5 w-5" />
-              <span>List Your Materials</span>
+              <span>List Materials</span>
             </button>
           </div>
         </div>
       </header>
 
       {/* Features Section */}
-      <section className="py-24 bg-slate-800">
+      <section id="how-it-works" className="py-24 bg-slate-800">
         <div className="container mx-auto px-6">
           <h2 className="text-3xl font-bold text-white text-center mb-16">How It Works</h2>
           <div className="grid md:grid-cols-3 gap-12">
@@ -155,7 +161,7 @@ function App() {
               </div>
               <h3 className="text-xl font-semibold text-white mb-4">List Resources</h3>
               <p className="text-gray-300">
-                Register your business and list your available resources or requirements.
+                Register your organization and share your resource needs or available materials.
               </p>
             </div>
             <div className="bg-slate-700 p-8 rounded-xl">
@@ -164,7 +170,7 @@ function App() {
               </div>
               <h3 className="text-xl font-semibold text-white mb-4">AI Matching</h3>
               <p className="text-gray-300">
-                Our AI system matches your resources with potential partners based on compatibility.
+                Our AI system connects you with compatible partners based on your needs and capabilities.
               </p>
             </div>
             <div className="bg-slate-700 p-8 rounded-xl">
@@ -173,11 +179,21 @@ function App() {
               </div>
               <h3 className="text-xl font-semibold text-white mb-4">Create Value</h3>
               <p className="text-gray-300">
-                Connect with matches and create sustainable business relationships.
+                Transform waste into resources and build sustainable partnerships.
               </p>
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Global Map Section */}
+      <section id="map">
+        <GlobalMap />
+      </section>
+
+      {/* Role Information Section */}
+      <section id="roles">
+        <RoleInfo />
       </section>
 
       {/* Stats Section */}
@@ -186,7 +202,7 @@ function App() {
           <div className="grid md:grid-cols-3 gap-12 text-center">
             <div>
               <div className="text-4xl font-bold text-emerald-400 mb-2">500+</div>
-              <div className="text-gray-300">Active Businesses</div>
+              <div className="text-gray-300">Active Organizations</div>
             </div>
             <div>
               <div className="text-4xl font-bold text-emerald-400 mb-2">1,200+</div>
@@ -227,10 +243,10 @@ function App() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Workflow className="h-6 w-6 text-emerald-400" />
-              <span className="text-xl font-bold text-white">EcoSync</span>
+              <span className="text-xl font-bold text-white">LoopLink</span>
             </div>
             <div className="text-gray-400 text-sm">
-              © 2025 EcoSync. All rights reserved.
+              © 2025 LoopLink. All rights reserved.
             </div>
           </div>
         </div>
@@ -245,6 +261,9 @@ function App() {
           type={showMaterialForm} 
           onClose={() => setShowMaterialForm(null)} 
         />
+      )}
+      {showOnboarding && (
+        <OnboardingForm onClose={() => setShowOnboarding(false)} />
       )}
     </div>
   );

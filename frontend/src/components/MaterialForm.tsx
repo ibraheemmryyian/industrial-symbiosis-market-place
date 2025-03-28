@@ -23,18 +23,22 @@ export function MaterialForm({ onClose, type }: MaterialFormProps) {
     setError('');
 
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
       const { error: err } = await supabase.from('materials').insert([
         {
           ...formData,
           type,
           quantity: parseFloat(formData.quantity),
+          company_id: user.id
         },
       ]);
 
       if (err) throw err;
       onClose();
-    } catch (err) {
-      setError('Failed to submit material. Please try again.');
+    } catch (err: any) {
+      setError(err.message || 'Failed to submit material. Please try again.');
       console.error('Error:', err);
     } finally {
       setLoading(false);
@@ -115,7 +119,9 @@ export function MaterialForm({ onClose, type }: MaterialFormProps) {
             </div>
 
             {error && (
-              <div className="text-red-500 text-sm">{error}</div>
+              <div className="text-red-500 text-sm bg-red-50 p-2 rounded">
+                {error}
+              </div>
             )}
 
             <button

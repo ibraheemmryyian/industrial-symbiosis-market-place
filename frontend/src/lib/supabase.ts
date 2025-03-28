@@ -15,11 +15,11 @@ export async function isUserAdmin(userId: string): Promise<boolean> {
     const { data, error } = await supabase
       .from('companies')
       .select('role')
-      .eq('id', userId)
-      .single();
+      .eq('id', userId);
     
     if (error) throw error;
-    return data?.role === 'admin';
+    // Return false if no company record exists
+    return data?.[0]?.role === 'admin';
   } catch (error) {
     console.error('Error checking admin status:', error);
     return false;
