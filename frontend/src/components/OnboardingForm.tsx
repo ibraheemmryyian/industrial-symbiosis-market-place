@@ -27,14 +27,13 @@ export function OnboardingForm({ onClose }: OnboardingFormProps) {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const { error: err } = await supabase.from('company_profiles').insert([
-        {
-          ...formData,
-          company_id: user.id
-        },
-      ]);
-
-      if (err) throw err;
+      // Use stored procedure to handle company/profile creation with RLS
+      const { error: procError } = await supabase.rpc('create_company_and_profile', {
+        user_id: user.id,
+        profile_data: formData
+      });
+      
+      if (procError) throw procError;
       onClose();
     } catch (err: any) {
       setError(err.message || 'Failed to save profile. Please try again.');

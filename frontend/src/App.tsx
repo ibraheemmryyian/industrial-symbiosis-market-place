@@ -1,21 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { Factory, Recycle, Search, TrendingUp, Users, Workflow } from 'lucide-react';
 import { supabase } from './lib/supabase';
+import { Session } from '@supabase/supabase-js';
 import { AuthModal } from './components/AuthModal';
 import { MaterialForm } from './components/MaterialForm';
 import { AdminHub } from './components/AdminHub';
 import { OnboardingForm } from './components/OnboardingForm';
 import { GlobalMap } from './components/GlobalMap';
 import { RoleInfo } from './components/RoleInfo';
+import { MatchList } from './components/MatchList';
 import { isUserAdmin } from './lib/supabase';
 
 function App() {
-  const [session, setSession] = useState(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showMaterialForm, setShowMaterialForm] = useState<'waste' | 'requirement' | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showAdminHub, setShowAdminHub] = useState(false);
+  const [showMatches, setShowMatches] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -50,7 +53,7 @@ function App() {
     } else if (isAdmin) {
       setShowAdminHub(true);
     } else {
-      setShowOnboarding(true);
+      setShowMatches(true);
     }
   };
 
@@ -92,6 +95,30 @@ function App() {
     );
   }
 
+  if (showMatches && session) {
+    return (
+      <div>
+        <nav className="bg-slate-900 p-4">
+          <div className="container mx-auto flex justify-between items-center">
+            <div className="flex items-center space-x-2">
+              <Workflow className="h-8 w-8 text-emerald-400" />
+              <span className="text-2xl font-bold text-white">LoopLink</span>
+            </div>
+            <button
+              onClick={() => setShowMatches(false)}
+              className="text-white hover:text-emerald-400 transition"
+            >
+              Back to Main Site
+            </button>
+          </div>
+        </nav>
+        <div className="container mx-auto p-6">
+          <MatchList />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800">
       {/* Hero Section */}
@@ -119,7 +146,7 @@ function App() {
               onClick={handleAction}
               className="bg-emerald-500 text-white px-6 py-2 rounded-lg hover:bg-emerald-600 transition"
             >
-              {session ? (isAdmin ? 'Admin Dashboard' : 'My Profile') : 'Get Started'}
+              {session ? (isAdmin ? 'Admin Dashboard' : 'My Matches') : 'Get Started'}
             </button>
           </div>
         </nav>
