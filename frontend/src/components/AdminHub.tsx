@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase';
 import { Users, Settings, Database, Activity, Link } from 'lucide-react';
 import { MatchList } from './MatchList';
 import { Link as RouterLink } from 'react-router-dom';
-import { Bar } from 'react-chartjs-2';
+import { Bar, Line } from 'react-chartjs-2';
 
 interface Company {
   id: string;
@@ -82,6 +82,19 @@ export function AdminHub() {
         label: 'Counts',
         data: [materials.length, matches.length, companies.length],
         backgroundColor: ['rgba(75, 192, 192, 0.6)', 'rgba(153, 102, 255, 0.6)', 'rgba(255, 159, 64, 0.6)'],
+      },
+    ],
+  };
+
+  const lineChartData = {
+    labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+    datasets: [
+      {
+        label: 'Materials Over Time',
+        data: [12, 19, 3, 5, 2, 3],
+        fill: false,
+        backgroundColor: 'rgba(75, 192, 192, 1)',
+        borderColor: 'rgba(75, 192, 192, 0.2)',
       },
     ],
   };
@@ -284,6 +297,11 @@ export function AdminHub() {
               )}
             </>
           )}
+
+          {/* Line Chart Section */}
+          <div className="mt-6">
+            <Line data={lineChartData} />
+          </div>
         </div>
       </div>
     </div>

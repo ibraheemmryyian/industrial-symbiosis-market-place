@@ -86,6 +86,11 @@ export function AuthModal({ onClose }: AuthModalProps) {
     }
   };
 
+  const handleSocialLogin = async (provider: string) => {
+    const { error } = await supabase.auth.signInWithOAuth({ provider });
+    if (error) console.error('Social login error:', error);
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-xl p-6 w-full max-w-md relative">
@@ -171,6 +176,8 @@ export function AuthModal({ onClose }: AuthModalProps) {
           >
             {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
           </button>
+
+          <button onClick={() => handleSocialLogin('google')} className="w-full bg-red-500 text-white py-2 rounded-lg">Sign in with Google</button>
         </form>
       </div>
     </div>

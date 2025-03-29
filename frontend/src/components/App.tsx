@@ -9,6 +9,7 @@ function App() {
     const [showAdminHub, setShowAdminHub] = useState(false);
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [showMatches, setShowMatches] = useState(false);
+    const [session, setSession] = useState<Session | null>(null);
 
     const handleLogout = async () => {
         await supabase.auth.signOut();

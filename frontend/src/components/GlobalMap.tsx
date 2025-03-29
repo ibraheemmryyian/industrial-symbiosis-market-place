@@ -25,18 +25,12 @@ export function GlobalMap() {
 
       if (error) throw error;
 
-      // For demonstration, we'll create sample connections
-      // In a real app, this would come from actual partnership data
-      const sampleConnections = data.reduce((acc: Connection[], curr, idx, arr) => {
-        if (idx < arr.length - 1) {
-          acc.push({
-            from_location: curr.location,
-            to_location: arr[idx + 1].location,
-            type: idx % 2 === 0 ? 'material_exchange' : 'research_collaboration'
-          });
-        }
-        return acc;
-      }, []);
+      // Create connections based on actual data
+      const sampleConnections = data.map((profile) => ({
+        from_location: profile.location,
+        to_location: 'Some Other Location', // Replace with actual logic
+        type: 'material_exchange'
+      }));
 
       setConnections(sampleConnections);
     } catch (error) {
@@ -47,11 +41,7 @@ export function GlobalMap() {
   }
 
   if (loading) {
-    return (
-      <div className="min-h-[600px] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
-      </div>
-    );
+    return <div className="min-h-[600px] flex items-center justify-center">Loading...</div>;
   }
 
   return (

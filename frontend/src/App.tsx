@@ -10,6 +10,7 @@ import { GlobalMap } from './components/GlobalMap';
 import { RoleInfo } from './components/RoleInfo';
 import { MatchList } from './components/MatchList';
 import { isUserAdmin } from './lib/supabase';
+import { useMediaQuery } from 'react-responsive';
 
 function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -19,6 +20,7 @@ function App() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showAdminHub, setShowAdminHub] = useState(false);
   const [showMatches, setShowMatches] = useState(false);
+  const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -76,18 +78,17 @@ function App() {
   if (showAdminHub && isAdmin) {
     return (
       <div>
-        <nav className="bg-slate-900 p-4">
-          <div className="container mx-auto flex justify-between items-center">
-            <div className="flex items-center space-x-2">
-              <Workflow className="h-8 w-8 text-emerald-400" />
-              <span className="text-2xl font-bold text-white">LoopLink</span>
-            </div>
-            <button
-              onClick={() => setShowAdminHub(false)}
-              className="text-white hover:text-emerald-400 transition"
-            >
-              Back to Main Site
-            </button>
+        <nav className={`bg-slate-900 p-4 ${isMobile ? 'flex flex-col' : 'flex justify-between'}`}>
+          <div className="flex items-center space-x-2">
+            <Workflow className="h-8 w-8 text-emerald-400" />
+            <span className="text-2xl font-bold text-white">LoopLink</span>
+          </div>
+          <div className="flex items-center space-x-4">
+            {session && (
+              <button onClick={() => setShowConfirmLogout(true)} className="text-white hover:text-emerald-400 transition">
+                Logout
+              </button>
+            )}
           </div>
         </nav>
         <AdminHub />
@@ -98,18 +99,17 @@ function App() {
   if (showMatches && session) {
     return (
       <div>
-        <nav className="bg-slate-900 p-4">
-          <div className="container mx-auto flex justify-between items-center">
-            <div className="flex items-center space-x-2">
-              <Workflow className="h-8 w-8 text-emerald-400" />
-              <span className="text-2xl font-bold text-white">LoopLink</span>
-            </div>
-            <button
-              onClick={() => setShowMatches(false)}
-              className="text-white hover:text-emerald-400 transition"
-            >
-              Back to Main Site
-            </button>
+        <nav className={`bg-slate-900 p-4 ${isMobile ? 'flex flex-col' : 'flex justify-between'}`}>
+          <div className="flex items-center space-x-2">
+            <Workflow className="h-8 w-8 text-emerald-400" />
+            <span className="text-2xl font-bold text-white">LoopLink</span>
+          </div>
+          <div className="flex items-center space-x-4">
+            {session && (
+              <button onClick={() => setShowConfirmLogout(true)} className="text-white hover:text-emerald-400 transition">
+                Logout
+              </button>
+            )}
           </div>
         </nav>
         <div className="container mx-auto p-6">
@@ -131,7 +131,7 @@ function App() {
           />
         </div>
         
-        <nav className="relative z-10 container mx-auto px-6 py-6">
+        <nav className={`relative z-10 container mx-auto px-6 py-6 ${isMobile ? 'flex flex-col' : 'flex justify-between'}`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Workflow className="h-8 w-8 text-emerald-400" />
