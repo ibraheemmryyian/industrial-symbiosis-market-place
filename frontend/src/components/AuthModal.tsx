@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { X } from 'lucide-react';
 
@@ -60,10 +60,6 @@ export function AuthModal({ onClose }: AuthModalProps) {
 
           if (companyError) throw companyError;
         }
-
-        // After successful sign-up, redirect to onboarding
-        onClose(); // Close the modal
-        // Optionally, you can trigger the onboarding form here
       } else {
         // Sign in
         const { error: signInError } = await supabase.auth.signInWithPassword({
@@ -78,17 +74,14 @@ export function AuthModal({ onClose }: AuthModalProps) {
           throw signInError;
         }
       }
+
+      onClose();
     } catch (err: any) {
       setError(err.message || 'Authentication failed. Please try again.');
       console.error('Auth Error:', err);
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleSocialLogin = async (provider: string) => {
-    const { error } = await supabase.auth.signInWithOAuth({ provider });
-    if (error) console.error('Social login error:', error);
   };
 
   return (
@@ -176,8 +169,6 @@ export function AuthModal({ onClose }: AuthModalProps) {
           >
             {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
           </button>
-
-          <button onClick={() => handleSocialLogin('google')} className="w-full bg-red-500 text-white py-2 rounded-lg">Sign in with Google</button>
         </form>
       </div>
     </div>

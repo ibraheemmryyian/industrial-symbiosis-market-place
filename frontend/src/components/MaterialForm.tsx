@@ -55,6 +55,7 @@ export function MaterialForm({ onClose, type }: MaterialFormProps) {
         companyId = newCompanyId;
       }
 
+      if (rpcError) throw rpcError;
       if (!companyId) throw new Error('Failed to create/get company');
 
       const { error: err } = await supabase.from('materials').insert([

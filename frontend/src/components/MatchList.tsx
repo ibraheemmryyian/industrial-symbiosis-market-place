@@ -32,7 +32,6 @@ export function MatchList() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [filter, setFilter] = useState('all');
 
   useEffect(() => {
     loadMatches();
@@ -44,6 +43,8 @@ export function MatchList() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
+      // Get matches where current user is either waste provider or consumer
+      // First get user's company_id
       const { data: profile } = await supabase
         .from('company_profiles')
         .select('company_id')
@@ -95,17 +96,10 @@ export function MatchList() {
     <div className="bg-white rounded-xl shadow-sm p-6">
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Potential Matches</h2>
 
-      <div className="flex justify-between mb-4">
-        <select onChange={(e) => setFilter(e.target.value)} className="border rounded p-2">
-          <option value="all">All Matches</option>
-          <option value="accepted">Accepted</option>
-          <option value="pending">Pending</option>
-          <option value="rejected">Rejected</option>
-        </select>
-      </div>
-
       {loading ? (
-        <div className="flex items-center justify-center py-12">Loading...</div>
+        <div className="flex items-center justify-center py-12">
+          <Activity className="h-8 w-8 text-emerald-500 animate-spin" />
+        </div>
       ) : error ? (
         <div className="text-red-500 bg-red-50 p-4 rounded-lg">{error}</div>
       ) : matches.length === 0 ? (

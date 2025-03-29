@@ -54,13 +54,6 @@ export function OnboardingForm({ onClose }: OnboardingFormProps) {
 
         <h2 className="text-2xl font-bold mb-6">Complete Your Profile</h2>
 
-        <div className="mb-4">
-          <div className="bg-gray-200 rounded-full h-2">
-            <div className="bg-emerald-500 h-2 rounded-full" style={{ width: '50%' }}></div>
-          </div>
-          <p className="text-sm text-gray-500">50% Complete</p>
-        </div>
-
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid md:grid-cols-2 gap-6">
             <div>
