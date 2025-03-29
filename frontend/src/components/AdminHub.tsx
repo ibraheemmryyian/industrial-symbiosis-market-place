@@ -26,8 +26,10 @@ interface Material {
 export function AdminHub() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [materials, setMaterials] = useState<Material[]>([]);
+  const [matches, setMatches] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'companies' | 'materials' | 'matches'>('companies');
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -53,6 +55,16 @@ export function AdminHub() {
 
       if (materialsError) throw materialsError;
       setMaterials(materialsData || []);
+
+      // Load matches
+      const { data: matchesData, error: matchesError } = await supabase
+        .from('matches')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (matchesError) throw matchesError;
+      setMatches(matchesData || []);
+
     } catch (error) {
       console.error('Error loading admin data:', error);
     } finally {
@@ -97,6 +109,11 @@ export function AdminHub() {
         borderColor: 'rgba(75, 192, 192, 0.2)',
       },
     ],
+  };
+
+  const checkUserProfileCompletion = () => {
+    // Implement your logic to check if the user profile is complete
+    return true; // Replace with actual check
   };
 
   return (

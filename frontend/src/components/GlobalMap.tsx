@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
 
 interface Connection {
-  from_location: string;
-  to_location: string;
+  from_location: { lat: number; lng: number };
+  to_location: { lat: number; lng: number };
   type: string;
 }
 
@@ -27,8 +28,8 @@ export function GlobalMap() {
 
       // Create connections based on actual data
       const sampleConnections = data.map((profile) => ({
-        from_location: profile.location,
-        to_location: 'Some Other Location', // Replace with actual logic
+        from_location: { lat: 51.505, lng: -0.09 }, // Replace with actual logic
+        to_location: { lat: 40.7128, lng: -74.0060 }, // Replace with actual logic
         type: 'material_exchange'
       }));
 
@@ -53,7 +54,7 @@ export function GlobalMap() {
       {connections.map((connection, index) => (
         <Marker key={index} position={[connection.from_location.lat, connection.from_location.lng]}>
           <Popup>
-            {connection.type} from {connection.from_location} to {connection.to_location}
+            {connection.type} from {connection.from_location.lat}, {connection.from_location.lng} to {connection.to_location.lat}, {connection.to_location.lng}
           </Popup>
         </Marker>
       ))}

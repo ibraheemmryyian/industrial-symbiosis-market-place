@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Activity, Link, MapPin, Check, X, Spinner } from 'lucide-react';
+import { Activity, Link, MapPin, Check, X } from 'lucide-react';
 
 interface Match {
   id: string;
