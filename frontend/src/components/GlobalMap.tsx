@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 
 interface Connection {
   from_location: string;
@@ -54,32 +55,18 @@ export function GlobalMap() {
   }
 
   return (
-    <div className="bg-slate-900 min-h-[600px] relative">
-      <div className="absolute inset-0 opacity-20">
-        {/* World map background - in production, use a proper map visualization library */}
-        <img
-          src="https://images.unsplash.com/photo-1589519160732-57fc498494f8?auto=format&fit=crop&q=80"
-          alt="World Map"
-          className="w-full h-full object-cover"
-        />
-      </div>
-      
-      <div className="relative z-10 container mx-auto px-6 py-12">
-        <h2 className="text-3xl font-bold text-white mb-8">Global Impact Network</h2>
-        
-        <div className="grid md:grid-cols-3 gap-6">
-          {connections.map((connection, index) => (
-            <div key={index} className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-              <div className="text-emerald-400 font-semibold">
-                {connection.type === 'material_exchange' ? 'Material Exchange' : 'Research Collaboration'}
-              </div>
-              <div className="text-white/80 text-sm mt-2">
-                {connection.from_location} → {connection.to_location}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
+    <MapContainer center={[51.505, -0.09]} zoom={2} className="min-h-[600px]">
+      <TileLayer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      />
+      {connections.map((connection, index) => (
+        <Marker key={index} position={[connection.from_location.lat, connection.from_location.lng]}>
+          <Popup>
+            {connection.type} from {connection.from_location} to {connection.to_location}
+          </Popup>
+        </Marker>
+      ))}
+    </MapContainer>
   );
 }

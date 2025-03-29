@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { X } from 'lucide-react';
 
@@ -60,6 +60,10 @@ export function AuthModal({ onClose }: AuthModalProps) {
 
           if (companyError) throw companyError;
         }
+
+        // After successful sign-up, redirect to onboarding
+        onClose(); // Close the modal
+        // Optionally, you can trigger the onboarding form here
       } else {
         // Sign in
         const { error: signInError } = await supabase.auth.signInWithPassword({
@@ -74,8 +78,6 @@ export function AuthModal({ onClose }: AuthModalProps) {
           throw signInError;
         }
       }
-
-      onClose();
     } catch (err: any) {
       setError(err.message || 'Authentication failed. Please try again.');
       console.error('Auth Error:', err);

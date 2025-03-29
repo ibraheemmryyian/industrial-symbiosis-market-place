@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Users, Settings, Database, Activity, Link } from 'lucide-react';
 import { MatchList } from './MatchList';
+import { Link as RouterLink } from 'react-router-dom';
+import { Bar } from 'react-chartjs-2';
 
 interface Company {
   id: string;
@@ -73,11 +75,49 @@ export function AdminHub() {
     }
   }
 
+  const chartData = {
+    labels: ['Total Materials', 'Total Matches', 'Active Companies'],
+    datasets: [
+      {
+        label: 'Counts',
+        data: [materials.length, matches.length, companies.length],
+        backgroundColor: ['rgba(75, 192, 192, 0.6)', 'rgba(153, 102, 255, 0.6)', 'rgba(255, 159, 64, 0.6)'],
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         <div className="bg-white rounded-xl shadow-sm p-6">
           <h1 className="text-2xl font-bold text-gray-900 mb-6">Admin Dashboard</h1>
+
+          {/* Chart Section */}
+          <div className="mb-6">
+            <Bar data={chartData} />
+          </div>
+
+          {/* Summary Section */}
+          <div className="grid grid-cols-3 gap-4 mb-6">
+            <div className="bg-emerald-500 text-white p-4 rounded-lg">
+              <h2 className="text-lg font-bold">Total Materials</h2>
+              <p>{materials.length}</p>
+            </div>
+            <div className="bg-blue-500 text-white p-4 rounded-lg">
+              <h2 className="text-lg font-bold">Total Matches</h2>
+              <p>{matches.length}</p>
+            </div>
+            <div className="bg-yellow-500 text-white p-4 rounded-lg">
+              <h2 className="text-lg font-bold">Active Companies</h2>
+              <p>{companies.length}</p>
+            </div>
+          </div>
+
+          {/* Quick Links */}
+          <div className="flex space-x-4 mb-6">
+            <RouterLink to="/list-materials" className="bg-emerald-500 text-white px-4 py-2 rounded-lg">List New Materials</RouterLink>
+            <RouterLink to="/profile" className="bg-blue-500 text-white px-4 py-2 rounded-lg">View Profile</RouterLink>
+          </div>
 
           {/* Tabs */}
           <div className="flex space-x-4 mb-6">

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Activity, Link, MapPin, Check, X } from 'lucide-react';
+import { Activity, Link, MapPin, Check, X, Spinner } from 'lucide-react';
 
 interface Match {
   id: string;
@@ -44,7 +44,6 @@ export function MatchList() {
       if (!user) throw new Error('Not authenticated');
 
       // Get matches where current user is either waste provider or consumer
-      // First get user's company_id
       const { data: profile } = await supabase
         .from('company_profiles')
         .select('company_id')
@@ -98,7 +97,7 @@ export function MatchList() {
 
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <Activity className="h-8 w-8 text-emerald-500 animate-spin" />
+          <Spinner className="h-8 w-8 text-emerald-500 animate-spin" />
         </div>
       ) : error ? (
         <div className="text-red-500 bg-red-50 p-4 rounded-lg">{error}</div>
